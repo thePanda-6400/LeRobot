@@ -1,0 +1,44 @@
+Block A — Environment check + scaffold (≈50 min)
+A1. Confirm the stack (15 min). Run three one-liners: print python --version; import mujoco, 
+gym_hil (if gym_hil errors, pip install gym_hil); and import torch; print(torch.backends.mps.is_available()).
+ Done when: both imports succeed and MPS prints True. [Ref 1, Ref 6]
+
+A2. Repo skeleton (15 min). Make a grasp-dr/ folder, git init, create empty files (harness.py, and placeholders randomize.py, 
+collect_data.py, model.py, train.py, grasp_loop.py), add a one-line README title, and make your first commit. 
+Done when: git status shows the tree and the initial commit exists. [Ref 5]
+
+
+A3. First env contact (15–20 min). In harness.py, import gymnasium and gym_hil,
+ make gym_hil/PandaPickCubeBase-v0 with image_obs=True, print "env made", env.close(). 
+ Done when: it runs with no error. [Ref 1, Ref 2]
+
+
+Block B — Build the harness core (≈75 min)
+B1. See the observation (15 min). obs, info = env.reset();
+ print obs.keys(), obs["agent_pos"].shape, and obs["pixels"]["front"].shape.
+  Done when: you've seen the 18-dim state and a (128,128,3) frame. [Ref 1]
+B2. One step + termination (15–20 min). Sample an action, step() once, print the five returned values. 
+Then loop random steps until done or truncated, printing info and the step count at the end.
+ Done when: an episode ends and you've inspected info. Note: gym-hil's documented info keys are intervention-related (is_intervention, teleop_action), so read grasp success from reward, not info — success = reward > 0 is the robust proxy. [Ref 1]
+B3. Collect frames + save video (20 min). In that loop, append obs["pixels"]["front"] each step.
+     Write save_video(frames, path) using imageio.mimsave. Render headless (pull from the obs, don't open the live viewer). Done when: an mp4/gif of the flailing Panda exists and plays. (The fun one.) [Ref 1, Ref 3]
+B4. rollout() + evaluate() (20 min). Fold the loop into rollout(env, policy, max_steps) returning (frames, success, total_reward), with policy = lambda obs: env.action_space.sample(). Then evaluate(env, policy, n_episodes) returning success rate + mean reward. Done when: evaluate prints something like "0% success over 20 episodes." Near-zero is correct for random. [Ref 2]
+
+
+Block C — Ship the artifact + lock in (≈35 min)
+C1. Baseline GIF (15 min). Save one rollout as results/baseline.gif, commit it.
+ Done when: the GIF is in the repo and renders on GitHub — a visible artifact on day one. [Ref 3, Ref 5]
+C2. Clean up + commit (15–20 min). Add a one-line note at the top of harness.py:
+ how to swap in a real policy later (any obs → action function). Commit. 
+ Done when: it's committed and you can run evaluate on demand. [Ref 5]
+End-of-day checkpoint: confirmed environment, a scaffolded (public-ready) repo, a harness that rolls out + evaluates + saves video, and a committed baseline GIF. Clean stopping line — Day 2 is the domain-randomization wrapper and labeled data collection, needing none of today re-run.
+
+References (tagged to chunks)
+
+gym-hil repo — obs/action API and a runnable example your harness mirrors (make env with image_obs=True, loop, stack front/wrist frames, imageio.mimsave): https://github.com/huggingface/gym-hil
+Gymnasium basic usage — make/reset/step/spaces and the five-tuple: https://gymnasium.farama.org/introduction/basic_usage/
+imageio — saving GIF/mp4 with mimsave: https://imageio.readthedocs.io
+MuJoCo Python bindings — for later chunks that read model fields; also rendering/MUJOCO_GL notes: https://mujoco.readthedocs.io/en/stable/python.html
+Git basics — repo init and commits: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Repository
+LeRobot repo + docs — install verification and sim guides: https://github.com/huggingface/lerobot and https://huggingface.co/docs/lerobot
+
