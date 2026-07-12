@@ -1,3 +1,5 @@
+#script to collect data 
+
 from pathlib import Path
 import csv
 
