@@ -28,6 +28,7 @@ for epoch in range(500):
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
-
+    torch.save(model.state_dict(), f'model_epoch_{epoch+1}.pth')
     if epoch%20 == 0:
         print(f'Epoch [{epoch+1}], Loss: {loss.item():.4f}')
+
