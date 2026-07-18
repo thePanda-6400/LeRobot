@@ -22,8 +22,7 @@ class RandomizeWrapper(gym.Wrapper):
         m.geom_rgba[self.cube_geom_id, :3] = np.random.uniform(0, 1, size=3)
         m.light_diffuse[:] = np.random.uniform(0.4, 1.0)
 
-        obs, info = self.env.reset(**kwargs)
-
+        obs, info = self.enw
         # position: after reset (dynamic state)
         d = self.env.unwrapped.data
         d.qpos[self.qpos_adr + 0] += np.random.uniform(-0.05, 0.05)   # x jitter

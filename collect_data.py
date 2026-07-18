@@ -10,6 +10,7 @@ import mujoco
 
 from randomize import RandomizeWrapper
 
+
 N_SAMPLES = 300
 DATA = Path("data")
 IMAGES = DATA / "images"
