@@ -17,16 +17,20 @@ class RandomizeWrapper(gym.Wrapper):
         self.qpos_adr = m.jnt_qposadr[jnt]        
     def reset(self, **kwargs):
         m = self.env.unwrapped.model
+        d = self.env.unwrapped.data
 
-        # colour + lighting: before reset (model properties) Domain randomization applied so that the model properties are randomized before the reset, which is important for ensuring that the environment starts in a randomized state.
+        # colour + lighting BEFORE reset (model properties)
         m.geom_rgba[self.cube_geom_id, :3] = np.random.uniform(0, 1, size=3)
         m.light_diffuse[:] = np.random.uniform(0.4, 1.0)
 
-        obs, info = self.enw
-        # position: after reset (dynamic state)
-        d = self.env.unwrapped.data
-        d.qpos[self.qpos_adr + 0] += np.random.uniform(-0.05, 0.05)   # x jitter
-        d.qpos[self.qpos_adr + 1] += np.random.uniform(-0.05, 0.05)   # y jitter
+        obs, info = self.env.reset(**kwargs)
+
+        # position AFTER reset (dynamic state)
+        d.qpos[self.qpos_adr + 0] += np.random.uniform(-0.05, 0.05)
+        d.qpos[self.qpos_adr + 1] += np.random.uniform(-0.05, 0.05)
         mujoco.mj_forward(m, d)
+
+        # re-fetch the observation so the image reflects the moved cube
+        obs = self.env.unwrapped._get_obs() if hasattr(self.env.unwrapped, "_get_obs") else obs
 
         return obs, info

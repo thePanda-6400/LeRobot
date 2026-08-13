@@ -1,12 +1,16 @@
 import torch
 from model import CNN
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+from dataset import GraspDataset
+from torch.utils.data import Subset
+
+
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-print("device:", device)
 
 model = CNN().to(device)                          # move the model
-fake = torch.randn(8, 3, 128, 128).to(device)     # move the input
 
-out = model(fake)
-print(out.shape)      # torch.Size([8, 3])
-print(out.device)     # mps:0
+# Load the weights from 'grasp_model.pt' to test the model
+model.load_state_dict(torch.load('grasp_model.pt'))
+model.eval()

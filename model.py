@@ -12,7 +12,6 @@ class CNN(nn.Module):
         with torch.no_grad():
             dummy = torch.zeros(1, *input_shape)
             n_flat = self.flatten(self.conv2(self.conv1(dummy))).shape[1]
-        print("flattened size:", n_flat)
 
         self.linear1 = nn.Linear(n_flat, num_outputs)
 
@@ -27,6 +26,3 @@ class CNN(nn.Module):
         return self.linear1(x)
     
 
-model = CNN()
-fake = torch.randn(8, 3, 128, 128)
-print(model(fake).shape)     # expect torch.Size([8, 3])
