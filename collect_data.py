@@ -11,7 +11,7 @@ import mujoco
 from randomize import RandomizeWrapper
 
 
-N_SAMPLES = 300
+N_SAMPLES = 1000
 DATA = Path("data")
 IMAGES = DATA / "images"
 IMAGES.mkdir(parents=True, exist_ok=True)   # makes data/ and data/images/

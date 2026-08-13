@@ -6,6 +6,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+SCALE = 100.0   # scale tiny metre-labels up so the loss has a usable gradient
+
 
 class GraspDataset(Dataset):
     def __init__(self, data_dir="data"):
@@ -26,9 +28,11 @@ class GraspDataset(Dataset):
         image = torch.from_numpy(image)                  # to tensor
         image = image.permute(2, 0, 1)                   # (H,W,C) -> (C,H,W)
 
-        # --- label ---
+        # --- label ---     
         position = row[["x", "y", "z"]].to_numpy(dtype=np.float32)
+        position = position * SCALE                      # scale up before tensor
         position = torch.from_numpy(position)            # shape (3,)
+
 
         return image, position
 

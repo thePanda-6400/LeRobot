@@ -14,7 +14,8 @@ class RandomizeWrapper(gym.Wrapper):
         # cube position: find where the block's joint lives in qpos
         block_body = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "block")
         jnt = m.body_jntadr[block_body]
-        self.qpos_adr = m.jnt_qposadr[jnt]        
+        self.qpos_adr = m.jnt_qposadr[jnt]
+
     def reset(self, **kwargs):
         m = self.env.unwrapped.model
         d = self.env.unwrapped.data
@@ -31,6 +32,6 @@ class RandomizeWrapper(gym.Wrapper):
         mujoco.mj_forward(m, d)
 
         # re-fetch the observation so the image reflects the moved cube
-        obs = self.env.unwrapped._get_obs() if hasattr(self.env.unwrapped, "_get_obs") else obs
+        obs = self.env.unwrapped._compute_observation()   # real method, no silent guard
 
         return obs, info

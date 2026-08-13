@@ -1,11 +1,10 @@
 import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader, Subset, random_split
-
+import numpy as np
 from model import CNN
 from dataset import GraspDataset
 
-# ---- switch: True = 5.5 overfit test, False = 5.6 real run ----
 OVERFIT_TEST = False
 
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -18,10 +17,11 @@ def criterion(x, y):
 
 model = CNN().to(device)
 optimizer = Adam(model.parameters(), lr=0.001)
-
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
 
 if OVERFIT_TEST:
-    tiny = Subset(dataset, range(10))
+    idxs = np.linspace(0, len(dataset)-1, 10).astype(int).tolist()
+    tiny = Subset(dataset, idxs)
     loader = DataLoader(tiny, batch_size=10, shuffle=True)
 
     for epoch in range(300):
@@ -32,6 +32,8 @@ if OVERFIT_TEST:
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
+            scheduler.step()
+
 
         if epoch % 20 == 0:
             print(f"epoch {epoch:3d} | loss {loss.item():.6f}")
